@@ -1,6 +1,7 @@
 # Import python packages
 import streamlit as st
 import os
+import requests  
 from snowflake.snowpark.functions import col
 # from snowflake.snowpark.context import get_active_session -- remove line for SniS
 
@@ -48,6 +49,9 @@ if ingredients_list:
 
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
+        smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")  
+        st_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True) # Put the JSON into a Dataframe
+
 
     #st.write(ingredients_string)
 
@@ -62,8 +66,3 @@ if ingredients_list:
         session.sql(my_insert_stmt).collect()
         st.success('Your Smoothie is ordered, '+name_on_order+'!', icon="✅")
 
-# New section to display SmoothieFroot nutrition information
-import requests  
-smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")  
-#st.text(smoothiefroot_response.json()) # to expose the JSON data inside the Response Object
-st_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True) # Put the JSON into a Dataframe
