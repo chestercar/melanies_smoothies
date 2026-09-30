@@ -32,23 +32,14 @@ cnx = st.connection("snowflake")
 #    user="chestercar",
 #    password="nickelv@n735SF")
 session = cnx.session()
-my_dataframe = session.table("smoothies.public.fruit_options").select("FRUIT_NAME","SEARCH_ON")
-#st.dataframe(data=my_dataframe, use_container_width=True)
-
-# Collect rows into Python objects
-rows = my_dataframe.collect()  # returns list of Row objects
-
-# Build mapping from display → use
-options_map = {row["FRUIT_NAME"]: row["SEARCH_ON"] for row in rows}
-
-selected_display = st.multiselect(
+my_dataframe = session.table("smoothies.public.fruit_options").select(col("FRUIT_NAME"),col("SEARCH_ON"))
+st.dataframe(data=my_dataframe, use_container_width=True)
+st.stop()
+ingredients_list = st.multiselect(
     "Choose up to 5 ingredients:",
-    options=list(options_map.keys()),
+    my_dataframe,
     max_selections=5
     )
-
-# Map display values to use values
-ingredients_list = [options_map[d] for d in selected_display]
 
 if ingredients_list:
 #    st.write("You selected:", ingredients_list)
@@ -59,7 +50,7 @@ if ingredients_list:
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
         st.subheader(fruit_chosen + ' Nutrition Information')
-        smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/" + fruit_chosen) 
+        smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/" + fruit_chosen)  
         st_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True) # Put the JSON into a Dataframe
 
 
@@ -75,4 +66,3 @@ if ingredients_list:
     if time_to_insert:
         session.sql(my_insert_stmt).collect()
         st.success('Your Smoothie is ordered, '+name_on_order+'!', icon="✅")
-
