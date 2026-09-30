@@ -50,8 +50,19 @@ if ingredients_list:
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
         st.subheader(fruit_chosen + ' Nutrition Information')
-        smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/" + fruit_chosen)  
-        st_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True) # Put the JSON into a Dataframe
+        try:
+          smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/" + fruit_chosen) 
+          smoothiefroot_response.raise_for_status()  # Raises HTTPError for bad responses # I added to handle alternate values using search_on
+          st_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True) # Put the JSON into a Dataframe
+        except (smoothiefroot_response.requests.RequestException, ValueError, KeyError):
+          try:
+            smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/" + search_on)
+            smoothiefroot_response.raise_for_status()  # Raises HTTPError for bad responses # I added to handle alternate values using search_on
+            st_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True) # Put the JSON into a Dataframe
+          except (smoothiefroot_response.requests.RequestException, ValueError, KeyError):
+            data = "No Information Available"
+        
+#        st_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True) # Put the JSON into a Dataframe
 
 
     #st.write(ingredients_string)
