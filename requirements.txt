@@ -1,4 +1,6 @@
-# requirements.txt
+# requirements.txt 
+# when a new python library is added in the streamlit app, add the python library here as well
 snowflake-snowpark-python
 streamlit
 requests
+pandas
