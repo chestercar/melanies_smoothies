@@ -32,14 +32,23 @@ cnx = st.connection("snowflake")
 #    user="chestercar",
 #    password="nickelv@n735SF")
 session = cnx.session()
-my_dataframe = session.table("smoothies.public.fruit_options").select(col("SEARCH_ON"))
+my_dataframe = session.table("smoothies.public.fruit_options").select("FRUIT_NAME","SEARCH_ON")
 #st.dataframe(data=my_dataframe, use_container_width=True)
 
-ingredients_list = st.multiselect(
+# Collect rows into Python objects
+rows = my_dataframe.collect()  # returns list of Row objects
+
+# Build mapping from display → use
+options_map = {row["FRUIT_NAME"]: row["SEARCH_ON"] for row in rows}
+
+selected_display = st.multiselect(
     "Choose up to 5 ingredients:",
-    my_dataframe,
+    options=list(options_map.keys())
     max_selections=5
     )
+
+# Map display values to use values
+ingredients_list = [options_map[d] for d in selected_display]
 
 if ingredients_list:
 #    st.write("You selected:", ingredients_list)
