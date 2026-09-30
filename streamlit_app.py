@@ -43,7 +43,7 @@ options_map = {row["FRUIT_NAME"]: row["SEARCH_ON"] for row in rows}
 
 selected_display = st.multiselect(
     "Choose up to 5 ingredients:",
-    options=list(options_map.keys())
+    options=list(options_map.keys()),
     max_selections=5
     )
 
